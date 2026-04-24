@@ -1,0 +1,20 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "uzaak",
+  "description": "Uzaak local plugin marketplace",
+  "owner": {
+    "name": "Tiago Furlanetto"
+  },
+  "plugins": [
+    {
+      "name": "uzaak",
+      "description": "Custom slash commands for local dev workflows",
+      "source": "./plugins/uzaak"
+    },
+    {
+      "name": "bmad_v1",
+      "description": "BMAD v1 — 9-agent multi-agent coding pipeline (planning → implementation → QA → verdict)",
+      "source": "./plugins/bmad_v1"
+    }
+  ]
+}

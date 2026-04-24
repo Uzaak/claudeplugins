@@ -1,0 +1,7 @@
+{
+  "name": "uzaak",
+  "description": "Uzaak plugin — custom slash commands for local dev workflows",
+  "author": {
+    "name": "Tiago Furlanetto"
+  }
+}

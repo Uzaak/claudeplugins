@@ -1,0 +1,7 @@
+{
+  "name": "bmad_v1",
+  "description": "BMAD v1 — 9-agent multi-agent coding pipeline (planning → implementation → QA → verdict)",
+  "author": {
+    "name": "Tiago Furlanetto"
+  }
+}

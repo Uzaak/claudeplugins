@@ -1,0 +1,86 @@
+# Output Format Reference
+
+---
+
+## Section Headers (inline / Claude.ai)
+
+```
+## 📋 Mary (Analyst) — Product Brief
+## 📄 John (PM) — PRD
+## 🏗️ Winston (Architect) — Architecture
+## 📝 Bob (SM) — Story File
+## 💻 Amelia (Coder) — Implementation
+## 🧪 Quinn (QA) — Test Suite
+## 🔍 Reviewer — Code Review  [Score: X/10]
+## 🔥 Stress Tester — Stress Report  [Score: X/10]
+## 🏁 Verdict — Production Readiness
+```
+
+---
+
+## Final Summary Table (append after every Verdict)
+
+```markdown
+---
+## Pipeline Summary
+
+| Agent | Role | Output | Score |
+|-------|------|--------|-------|
+| Mary | Analyst | product-brief.md | — |
+| John | PM | PRD.md ({N} FRs, {M} NFRs) | — |
+| Winston | Architect | architecture.md ({N} ADRs) | — |
+| Bob | SM | story-{slug}.md | — |
+| Amelia | Coder | {filename}.{ext} ({N} lines) | — |
+| Quinn | QA | {N} tests, coverage {C}% | — |
+| Reviewer | Code Review | {N} issues ({X} critical) | {score}/10 |
+| Stress | Chaos/Perf | {N} scenarios | {score}/10 |
+| Verdict | Final Gate | {VERDICT} | {overall}/10 |
+
+**Production Readiness: {VERDICT}**
+**Overall Score: {X}/10**
+**Security Gate: {PASS / FAIL — list unresolved CRITICAL security issues}**
+**Coverage: {language} {C}% ({PASS/FAIL vs threshold})**
+
+### Top 3 Action Items
+1. {Most critical}
+2. {Second}
+3. {Third}
+```
+
+---
+
+## API / HTML Artifact — Tab Labels
+
+| Tab | Agent(s) | Content |
+|-----|----------|---------|
+| Plan | Mary + John | Brief + PRD |
+| Architecture | Winston + Bob | architecture.md + story |
+| Code | Amelia | Implementation |
+| QA Tests | Quinn | Test suite + coverage |
+| Review | Reviewer | Review + score |
+| Stress | Stress Tester | Stress report + score |
+| Verdict | Verdict Agent | Final verdict + summary |
+
+---
+
+## Agent Status Labels
+
+| State | Label | Color |
+|-------|-------|-------|
+| Not started | Idle | Gray |
+| Running | Running… | Blue (pulse) |
+| Complete | Done ✓ | Green |
+| Failed | Error | Red |
+
+---
+
+## File Extension Reference
+
+| Language | Source | Test |
+|----------|--------|------|
+| Go | `.go` | `_test.go` |
+| Java | `.java` | `Test.java` |
+| JavaScript | `.js` | `.test.js` |
+| TypeScript | `.ts` | `.test.ts` |
+| PHP | `.php` | `Test.php` |
+| Python | `.py` | `test_.py` |
