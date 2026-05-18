@@ -1,10 +1,12 @@
 # Claude Plugins Project
 
-This is a Claude Code plugin repository. It contains skills, agents, and related assets that extend Claude Code's behavior.
+This is a **Claude Plugin** — a Claude Code plugin repository. It contains skills, agents, and related assets that extend Claude Code's behavior.
+
+**IMPORTANT: Everything developed here must stay inside this project's folder. Do not create, modify, or delete any files outside of this directory under any circumstances.**
 
 ## Scope Rule
 
-When working on anything in this project, **only touch files within this project folder**. Never modify files outside this directory.
+When working on anything in this project, **only touch files within this project folder**. Never modify files outside this directory. This is a hard boundary — no exceptions.
 
 ## Structure
 
