@@ -1,0 +1,7 @@
+{
+  "name": "githubzak",
+  "description": "githubzak plugin — GitHub PR workflow skills: check, fix, and answer PR comments",
+  "author": {
+    "name": "Tiago Furlanetto"
+  }
+}

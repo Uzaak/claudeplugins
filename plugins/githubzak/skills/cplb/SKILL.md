@@ -3,7 +3,7 @@ name: cplb
 description: Use when the user runs /cplb with a branch name argument — creates or switches to the branch, commits all current changes with a generated message, pushes to remote, and opens a PR to main or master.
 ---
 
-# cplb — Commit, Push, Leave Building
+# githubzak: cplb — Commit, Push, Leave Building
 
 Invoked as `/cplb <branch-name>`. Execute these steps in order.
 
