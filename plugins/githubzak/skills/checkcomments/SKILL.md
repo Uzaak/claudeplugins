@@ -30,40 +30,42 @@ Store the result as `BRANCH`.
 ## Step 3 — Find open PR
 
 ```bash
-gh pr list --head <BRANCH> --state open --json number,url --jq '.[0]'
+PR_NUMBER=$(gh pr list --head <BRANCH> --state open --json number --jq '.[0].number')
+PR_URL=$(gh pr list --head <BRANCH> --state open --json url --jq '.[0].url')
 ```
 
-If the result is empty or null, report "No open PR found for branch `<BRANCH>`" and stop.
+If either result is empty or null, report "No open PR found for branch `<BRANCH>`" and stop.
 
-Store `PR_NUMBER` and `PR_URL` from the result.
+Store `PR_NUMBER` and `PR_URL` from the results above.
 
 ## Step 4 — Get owner and repo
 
 ```bash
-gh repo view --json owner,name --jq '{owner: .owner.login, repo: .name}'
+OWNER=$(gh repo view --json owner --jq '.owner.login')
+REPO=$(gh repo view --json name --jq '.name')
 ```
 
-Store `OWNER` and `REPO`.
+Store `OWNER` and `REPO` from the results above.
 
 ## Step 5 — Fetch inline review comments
 
 ```bash
-gh api "repos/<OWNER>/<REPO>/pulls/<PR_NUMBER>/comments"
+gh api "repos/<OWNER>/<REPO>/pulls/<PR_NUMBER>/comments?per_page=100"
 ```
 
-Each item has:
+Results are returned chronologically (oldest first, the API default). Each item has:
 - `path` — file path relative to repo root
-- `line` — current line number (may be null for outdated comments; fall back to `original_line`)
+- `line` — current line number. If `line` is null, fall back to `original_line`. If both are null (outdated/deleted context), display the line as `?` (e.g. `filename.kt:?`)
 - `body` — comment text
 - `id` — comment ID (needed by fixcomment and answercomment)
 
 ## Step 6 — Fetch general PR comments
 
 ```bash
-gh api "repos/<OWNER>/<REPO>/issues/<PR_NUMBER>/comments"
+gh api "repos/<OWNER>/<REPO>/issues/<PR_NUMBER>/comments?per_page=100"
 ```
 
-Each item has:
+Results are returned chronologically (oldest first, the API default). Each item has:
 - `body` — comment text
 - `id` — comment ID
 - No `path` or `line` — these are top-level PR comments, not tied to a file
@@ -74,7 +76,9 @@ Print the PR URL first, then the comment list.
 
 Group inline comments by file, sorted by line number. Truncate comment bodies to 80 characters with `...` if longer.
 
-Output format:
+For alignment, left-align the `filename:line` part padded to the width of the longest `filename:line` entry in the list, then ` — `, then the truncated comment body in quotes.
+
+Output format (example where `SuperNiceController.kt:183` is the longest entry at 26 chars):
 
 ```
 PR: <PR_URL>
