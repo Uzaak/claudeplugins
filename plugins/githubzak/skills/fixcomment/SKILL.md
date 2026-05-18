@@ -40,7 +40,7 @@ Find the comment where both conditions are true:
 - `path` ends with `<FILENAME>` (to handle files in subdirectories, e.g. `com/example/SuperNiceController.kt` matches `SuperNiceController.kt`)
 - `line` equals `<LINENUMBER>`, OR (if `line` is null) `original_line` equals `<LINENUMBER>`
 
-Note: if `line` is null, the comment is "outdated" (posted on code that has since changed). `original_line` refers to the old line number, which may no longer match the current file. Warn the user: "This comment is outdated — it was posted on code that has since changed. The line reference may be inaccurate. Do you still want to proceed?" and wait for their answer.
+Note: if `line` is null, the comment is "outdated" (posted on code that has since changed). `original_line` refers to the old line number, which may no longer match the current file. Warn the user: "This comment is outdated — it was posted on code that has since changed. The line reference may be inaccurate. Do you still want to proceed?" and wait for their answer. If the user declines, stop and do not store the comment.
 
 **If no comment matches:**
 Report "No inline comment found at `<FILENAME>:<LINENUMBER>`." and stop.

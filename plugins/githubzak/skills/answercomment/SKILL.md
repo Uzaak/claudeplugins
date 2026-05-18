@@ -85,7 +85,7 @@ Before posting, show the user the composed reply and ask: "Ready to post this re
 ## Step 6 — Post the reply
 
 ```bash
-gh api "repos/<OWNER>/<REPO>/pulls/comments/<COMMENT_ID>/replies" \
+gh api --method POST "repos/<OWNER>/<REPO>/pulls/comments/<COMMENT_ID>/replies" \
   -f body="<full reply text>"
 ```
 

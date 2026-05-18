@@ -57,7 +57,7 @@ Results are returned chronologically (oldest first, the API default). Each item 
 - `path` — file path relative to repo root
 - `line` — current line number. If `line` is null, fall back to `original_line`. If both are null (outdated/deleted context), display the line as `?` (e.g. `filename.kt:?`)
 - `body` — comment text
-- `id` — comment ID (needed by fixcomment and answercomment)
+- `id` — comment ID (used internally; not displayed in output)
 
 ## Step 6 — Fetch general PR comments
 
