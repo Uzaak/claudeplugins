@@ -121,11 +121,27 @@ For **each** discovered route record:
 - `method`: HTTP verb (GET, POST, PUT, PATCH, DELETE)
 - `path`: full path with parameter placeholders in `{param}` format (convert `:param` → `{param}`, `<param>` → `{param}`)
 - `handler`: function or controller action name
-- `tags`: infer from path prefix or controller name (e.g. `/users/` → `users`)
+- `tags`: infer from path prefix or controller name (e.g. `/users/` → `tags: [users]`)
 
 Record `routes[]` = `{ method, path, handler, tags[] }`.
 
-Print: `[<project>] Discovered <N> routes`
+### 3b — Health check endpoint discovery (always run, regardless of framework results)
+
+Independently of the framework scan above, search the entire codebase for health check and liveness endpoints. These are often registered outside the main router or in middleware/server setup code and are easy to miss.
+
+Search for the following path strings in all `.go`, `.js`, `.ts`, `.py`, `.rb`, `.php` files:
+
+> `/health`, `/healthz`, `/ping`, `/status`, `/live`, `/liveness`, `/ready`, `/readiness`, `/actuator/health`, `/_health`, `/api/health`, `/api/ping`
+
+Also search for handler function names: `health`, `healthCheck`, `healthz`, `ping`, `liveness`, `readiness`, `status`.
+
+For each found health check endpoint:
+- Add it to `routes[]` if not already present
+- Tag it as `tags: [health]`
+- Mark it as `requires_auth: false`
+- The response schema is always: HTTP 200 with `{ "status": "ok" }` or equivalent (use what the code returns; if not determinable, use `{ status: string }`)
+
+Print: `[<project>] Discovered <N> routes (<M> health check endpoints included)`
 
 ---
 
@@ -221,6 +237,50 @@ If `existing_spec == null`: build the spec entirely from discovered data.
 ---
 
 ## Step 8 — Write open-api.specs
+
+**Always write the file.** Even if no routes were found, `open-api.specs` must be created. A missing file is never an acceptable outcome.
+
+### 8a — Determine mode
+
+| Condition | Mode |
+|---|---|
+| `routes[]` has at least one non-health-check entry | **normal** — full spec |
+| `routes[]` has only health check entries | **health-only** — spec with health paths + no-business-endpoints note |
+| `routes[]` is empty (no routes found at all) | **empty** — spec with no paths + explanation |
+
+### 8b — Structure for empty mode (no routes at all)
+
+If mode is **empty**, write:
+
+```yaml
+openapi: "3.0.3"
+
+info:
+  title: <project-name>
+  version: "1.0.0"
+  description: |
+    No HTTP endpoints were detected in this project through static analysis.
+
+    This may mean the project is a background worker, a CLI tool, a library,
+    or a message-queue consumer that does not expose an HTTP interface.
+    If endpoints exist, they may be registered dynamically or generated at
+    runtime and cannot be discovered through static analysis alone.
+
+x-no-endpoints: true
+
+paths: {}
+```
+
+### 8c — Structure for health-only mode
+
+If mode is **health-only**, write the full spec structure below but add to the `info.description`:
+
+```
+NOTE: No business endpoints were detected. Only infrastructure/health endpoints are documented.
+This service may be a background worker or internal component without a public API surface.
+```
+
+### 8d — Normal and health-only spec structure
 
 Write a single YAML file to `<project-dir>/open-api.specs`.
 
@@ -340,7 +400,8 @@ components:
 ║  <project-name>                                  ║
 ╠══════════════════════════════════════════════════╣
 ║ Stack/Framework : <stack> / <framework>          ║
-║ Routes found    : <N>                            ║
+║ Mode            : <normal / health-only / empty> ║
+║ Routes found    : <N> (<M> health check)         ║
 ║ Schemas         : <N> components                 ║
 ╠══════════════════════════════════════════════════╣
 ║ Source          : <built from scratch /          ║
@@ -368,4 +429,6 @@ If any routes had undeterminable schemas, list them:
 - **One file, one format.** Output is always YAML, always named `open-api.specs`, always at the project root.
 - **Mark unknowns.** Use `schema: {}` with a `# TODO:` comment rather than guessing a shape you cannot confirm.
 - **Infer summaries from handler names.** `GetUserByID` → "Get user by ID". `CreateOrder` → "Create order". Avoid generic labels like "Handler" or "Endpoint".
-- **Always write the output.** Even if only 1 route is found, write the spec file. A partial spec is more useful than nothing.
+- **Always write the output.** The file must be written regardless of how many routes were found — zero routes, only health checks, or a full API. A missing `open-api.specs` is never acceptable.
+- **Always scan for health checks separately.** Health check endpoints are registered outside the main router in many projects. Step 3b must always run, even when the framework scan found routes.
+- **Explain when empty.** If no routes were found, the spec's `info.description` must clearly state this and suggest why (worker, CLI, library, dynamic registration). Use `x-no-endpoints: true` to make the absence machine-readable.

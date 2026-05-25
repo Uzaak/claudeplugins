@@ -114,8 +114,12 @@ For each cache usage, extract:
 - **TTL** if set explicitly
 - **What is cached** (inferred from key name and surrounding code)
 - **Read-through or cache-aside** (does it check cache first, fall back to DB?)
+- **How the retrieved value is used** — after a successful cache hit, read the code that uses the result. Identify:
+  - Which specific **fields or properties** are accessed on the cached object (e.g. `.Type`, `["status"]`, `.Price`)
+  - What **decisions or branches** those fields drive (e.g. "if `store.Type == "franchise"` routes to the franchise handler, otherwise uses the default handler"; "if `user.Active` is false, returns 403 immediately")
+  - Any **further lookups** triggered by the cached data (e.g. "uses `store.WarehouseID` to query the warehouse table")
 
-Record as `cache_patterns[]` = `{ system, key_pattern, ttl, what_is_cached, strategy }`.
+Record as `cache_patterns[]` = `{ system, key_pattern, ttl, what_is_cached, strategy, field_usage[] }`.
 
 Print: `[<project>] Found <N> cache patterns`
 
@@ -195,14 +199,15 @@ Examples of significant operations:
 For each operation, trace what happens to data:
 1. What data comes in (request body, message payload)
 2. What is validated / enriched
-3. What is read from cache (if any)
-4. What is read from DB (if cache miss or not cached)
-5. What is written to DB
-6. What is written to cache (if any)
-7. What external services are called and with what
-8. What events/messages are published
+3. What is read from cache (if any) — name the cache system, the key pattern, and the object retrieved
+4. For each value retrieved from cache or DB: **which specific fields are accessed and what decisions they drive** — read the code after the fetch and follow what happens to each field. Look for `if`, `switch`, `match`, early `return`, or further lookups that branch on a retrieved value. Write these as concrete statements: *"the `store.type` field is checked — if `"franchise"` the request is forwarded to the franchise service, otherwise it is handled locally"*, *"if `user.blocked` is true, the handler returns 403 immediately"*, *"`order.warehouseID` is used to query the warehouse table for fulfilment routing"*.
+5. What is read from DB (if cache miss or not cached) — name the table/collection and the fields selected or used after the query
+6. What is written to DB — table name, key fields written
+7. What is written to cache (if any) — key pattern and TTL
+8. What external services are called and with what data
+9. What events/messages are published
 
-Write these as prose paragraphs (2–5 sentences each), not as code traces.
+**Prose quality bar:** A good data flow narrative reads like: *"When placing an order, the handler reads the `store` object from Memcached under key `store:<storeID>`. It uses `store.type` to decide fulfilment: `"own"` stores fulfil directly from the local warehouse; `"marketplace"` stores forward the order to the Marketplace API. The order is then written to the `orders` table with status `pending`, and an `order.created` message is published to the `orders` SQS queue."* Vague statements like "fetches store data and processes the order" are not acceptable — name the fields, name the decisions.
 
 Record `data_flows[]` = `{ operation, narrative }`.
 
@@ -256,9 +261,9 @@ Relationships: <plain English, e.g. "belongs to a User; has many OrderItems">
 
 <If no caching is found, write "No caching detected." Otherwise describe each pattern.>
 
-<For each cache pattern: what is cached, which system (Redis / Memcached), key pattern, TTL, and the cache strategy (read-through, cache-aside, write-through). Write as prose.>
+<For each cache pattern: what is cached, which system (Redis / Memcached), key pattern, TTL, the cache strategy (read-through, cache-aside, write-through), and — critically — what specific fields of the cached object are used downstream and what decisions they drive.>
 
-Example: *Product details are cached in Redis under `product:<id>` with a 5-minute TTL. Before every read, the service checks Redis; on a miss, it queries the database and populates the cache.*
+Example of required specificity: *Store configuration is cached in Memcached under key `store:<storeID>` with a 10-minute TTL (cache-aside). On a hit, `store.type` determines fulfilment routing — `"franchise"` stores forward to the Franchise API while all others are handled locally. `store.warehouseID` is used to look up the dispatch warehouse. On a miss, the store row is fetched from the `stores` table and the cache is populated before continuing.*
 
 ## External Service Integrations
 
@@ -292,11 +297,11 @@ Example: *Product details are cached in Redis under `product:<id>` with a 5-minu
 
 ## Key Data Flows
 
-<One sub-section per significant operation. Write in plain English, focusing on what happens to data. Mention the stores/services involved and the sequence.>
+<One sub-section per significant operation. Write in plain English. Each narrative must name: the source of each data fetch (which cache key / which DB table), the specific fields read from the result, and what those fields decide. Avoid generic summaries — trace the data and the branching it causes.>
 
 ### <Operation Name>
 
-<2–5 sentence narrative of the data flow.>
+<2–5 sentence narrative. Example of the required specificity: "The handler reads the `store` object from Memcached under key `store:<storeID>`. It checks `store.type`: if `"franchise"`, the request is forwarded to the Franchise API; otherwise it is fulfilled locally. The `order` row is written to the `orders` table with `status = "pending"`, and `store.warehouseID` is used to select the dispatch warehouse from the `warehouses` table.">
 
 ## Configuration
 
