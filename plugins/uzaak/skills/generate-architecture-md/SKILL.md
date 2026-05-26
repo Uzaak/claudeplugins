@@ -213,17 +213,9 @@ Record `data_flows[]` = `{ operation, narrative }`.
 
 ---
 
-## Step 7 — Rotate existing file
+## Step 7 — Write Architecture.md
 
-1. If `Architecture_old.md` exists in the project dir → delete it.
-2. If `Architecture.md` exists → rename it to `Architecture_old.md`.
-3. Proceed to write the new `Architecture.md`.
-
----
-
-## Step 8 — Write Architecture.md
-
-Create `<project-dir>/Architecture.md`:
+Write (overwriting if it already exists) `<project-dir>/Architecture.md`:
 
 ```markdown
 # Architecture — <project-name>
@@ -319,7 +311,7 @@ Example of required specificity: *Store configuration is cached in Memcached und
 
 ---
 
-## Step 9 — Summary
+## Step 8 — Summary
 
 ```
 ╔══════════════════════════════════════════════════╗
@@ -331,9 +323,6 @@ Example of required specificity: *Store configuration is cached in Memcached und
 ║ Cache patterns  : <N>                            ║
 ║ Ext integrations: <N>                            ║
 ║ Key data flows  : <N>                            ║
-╠══════════════════════════════════════════════════╣
-║ Previous arch   : saved as Architecture_old.md   ║
-║                   (or: none to rotate)           ║
 ╠══════════════════════════════════════════════════╣
 ║ Generated       : <YYYY-MM-DD HH:MM UTC>         ║
 ╚══════════════════════════════════════════════════╝
@@ -348,5 +337,4 @@ Example of required specificity: *Store configuration is cached in Memcached und
 - **No coding guidance.** Do not explain how to add features, how to write tests, or how the codebase is organized for developers.
 - **Data-first.** Every section must answer a question about data: what is stored, where, how long, and why.
 - **Evidence-based.** All claims must be traceable to a file you read. Mark inferences as *(inferred)*.
-- **Always rotate.** Never overwrite Architecture.md directly — always rotate to Architecture_old.md first.
 - **Infer names from config.** If the DB host is `orders-db.internal`, the database is likely named after the service. Use it.

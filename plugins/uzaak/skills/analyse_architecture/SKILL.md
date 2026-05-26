@@ -1,5 +1,5 @@
 ---
-name: analyse_architecture
+name: deprecated_analyse_architecture
 description: Use when the user runs /analyse_architecture — deeply inspects the project structure, dependencies, and libraries via Serena and DataDog, then writes Architecture.md, updates root CLAUDE.md, and writes per-subdirectory CLAUDE.md files.
 argument-hint: [project-directory]
 ---

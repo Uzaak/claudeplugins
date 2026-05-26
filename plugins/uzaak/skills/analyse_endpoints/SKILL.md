@@ -1,5 +1,5 @@
 ---
-name: analyse_endpoints
+name: deprecated_analyse_endpoints
 description: Use when the user runs /analyse_endpoints — inspects all application endpoints via Serena and cross-references them with DataDog metrics from the last 30 days to generate an Endpoints.md report at the project root.
 argument-hint: [project-directory]
 ---
