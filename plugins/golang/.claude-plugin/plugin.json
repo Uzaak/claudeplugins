@@ -1,0 +1,7 @@
+{
+  "name": "golang",
+  "description": "golang plugin — Go coding standards and best practices: style, error handling, concurrency, testing, Prometheus metrics, and library usage via Context7",
+  "author": {
+    "name": "Tiago Furlanetto"
+  }
+}

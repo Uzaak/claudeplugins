@@ -1,0 +1,7 @@
+{
+  "name": "rote-management",
+  "description": "rote-management plugin — skills for managing rote adapters: creating new adapters from OpenAPI specs, generating subagents, and configuring auth",
+  "author": {
+    "name": "Tiago Furlanetto"
+  }
+}
