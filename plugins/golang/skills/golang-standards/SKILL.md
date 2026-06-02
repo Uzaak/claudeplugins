@@ -1,5 +1,5 @@
 ---
-name: golang-dafiti-standards
+name: golang-standards
 description: Use when starting, extending, or reviewing any Go service. Covers project layout, gin setup, logrus logging, envconfig, domain module structure, middleware stack, security headers, Swagger, HTTP client, Docker, CI/CD, and naming conventions.
 ---
 
