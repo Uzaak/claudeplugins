@@ -25,6 +25,16 @@
       "name": "flutter_skills",
       "description": "Flutter skills — run, view, and interact with Flutter apps in the iOS simulator",
       "source": "./plugins/flutter_skills"
+    },
+    {
+      "name": "golang",
+      "description": "Go coding standards and best practices: style, error handling, concurrency, testing, Prometheus metrics, and library usage via Context7",
+      "source": "./plugins/golang"
+    },
+    {
+      "name": "rote-management",
+      "description": "rote-management — skills for managing rote adapters: creating new adapters from OpenAPI specs, generating subagents, and configuring auth",
+      "source": "./plugins/rote-management"
     }
   ]
 }
