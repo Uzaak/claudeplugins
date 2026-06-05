@@ -21,6 +21,23 @@ Collect the following from the user interactively (one question at a time):
 2. **host** — SSH target in `user@host` format (e.g. `deploy@192.168.1.10`)
 3. **project_dir** — absolute path to the project directory on the remote machine (e.g. `/home/deploy/myproject`)
 
+Then verify SSH connectivity:
+
+```bash
+ssh <host> "echo ok"
+```
+
+- If it fails: print the raw SSH error and stop — do not write the config file.
+
+If SSH succeeds, discover the claude binary path on the remote:
+
+```bash
+ssh <host> "bash -li -c 'which claude' 2>/dev/null || find /usr/local/bin /home -name claude 2>/dev/null | head -1"
+```
+
+- If a path is returned: use it as `host_claude_path`
+- If nothing is returned: print `Could not locate the claude binary on <host>. Install Claude Code there first.` and stop — do not write the config file.
+
 Then write `remote-me.json` to the **current working directory**:
 
 ```json
@@ -28,20 +45,12 @@ Then write `remote-me.json` to the **current working directory**:
   "name": "<name>",
   "host": "<host>",
   "project_dir": "<project_dir>",
+  "host_claude_path": "<discovered_path>",
   "session_id": null
 }
 ```
 
-Then verify SSH connectivity:
-
-```bash
-ssh <host> "echo ok"
-```
-
-- If output is `ok`: print `SSH connection to <host> verified. Config saved to ./remote-me.json`
-- If it fails: print the raw SSH error and warn the user to check their SSH access before using `/remote-me`
-
-The config file is written before the SSH check and must not be removed or overwritten if the check fails.
+Print: `SSH connection to <host> verified. claude found at <host_claude_path>. Config saved to ./remote-me.json`
 
 ---
 
@@ -72,20 +81,22 @@ Run `/remote-me init` to create one, or pass an explicit path: `/remote-me path/
 
 ### 2. Read config
 
-Parse the JSON. Extract: `host`, `project_dir`, `session_id`.
+Parse the JSON. Extract: `host`, `project_dir`, `host_claude_path`, `session_id`.
+
+If `host_claude_path` is missing or null: print `Config is missing host_claude_path. Re-run \`/remote-me init\` to regenerate it.` and stop.
 
 ### 3. Build and run the SSH command
 
 If `session_id` is null (first run):
 
 ```bash
-ssh <host> "cd <project_dir> && claude -p \"<prompt>\" --output-format json"
+ssh <host> "cd <project_dir> && <host_claude_path> -p \"<prompt>\" --output-format json"
 ```
 
 If `session_id` has a value:
 
 ```bash
-ssh <host> "cd <project_dir> && claude -p \"<prompt>\" -r <session_id> --output-format json"
+ssh <host> "cd <project_dir> && <host_claude_path> -p \"<prompt>\" -r <session_id> --output-format json"
 ```
 
 Capture stdout. If the SSH command itself fails (non-zero exit code): print the raw SSH error and stop — do not modify the config file.
