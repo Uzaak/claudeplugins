@@ -1,12 +1,12 @@
 ---
 name: generate-architecture-md
-description: Use when the user runs /generate-architecture-md — reads the project's data models, repositories, service layer, and runtime configuration to produce an Architecture.md focused on what the system stores, where it stores it, what it caches, and what external services it depends on. Not about code structure.
+description: Use when the user runs /generate-architecture-md — reads the project's data models, repositories, service layer, and runtime configuration to produce an architecture/External.md focused on what the system stores, where it stores it, what it caches, and what external services it depends on. Not about code structure.
 argument-hint: [project-directory]
 ---
 
 # uzaak: Generate Architecture.md
 
-Produce a runtime-focused `Architecture.md` that answers: **what does this system do with data?** Document what is persisted where, what is cached, what external services are called, and how data flows through key operations. Do NOT document directory structure or coding patterns.
+Produce a runtime-focused `architecture/External.md` that answers: **what does this system do with data?** Document what is persisted where, what is cached, what external services are called, and how data flows through key operations. Do NOT document directory structure or coding patterns.
 
 Print: `[<project>] Starting architecture analysis...`
 
@@ -215,7 +215,7 @@ Record `data_flows[]` = `{ operation, narrative }`.
 
 ## Step 7 — Write Architecture.md
 
-Write (overwriting if it already exists) `<project-dir>/Architecture.md`:
+Create the `<project-dir>/architecture/` directory if it does not exist, then write (overwriting if it already exists) `<project-dir>/architecture/External.md`:
 
 ```markdown
 # Architecture — <project-name>
@@ -315,7 +315,7 @@ Example of required specificity: *Store configuration is cached in Memcached und
 
 ```
 ╔══════════════════════════════════════════════════╗
-║        Architecture.md Generated                 ║
+║     architecture/External.md Generated           ║
 ║  <project-name>                                  ║
 ╠══════════════════════════════════════════════════╣
 ║ Stack           : <primary_stack>                ║
