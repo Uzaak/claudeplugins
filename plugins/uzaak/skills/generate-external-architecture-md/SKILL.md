@@ -1,10 +1,10 @@
 ---
-name: generate-architecture-md
-description: Use when the user runs /generate-architecture-md — reads the project's data models, repositories, service layer, and runtime configuration to produce an architecture/External.md focused on what the system stores, where it stores it, what it caches, and what external services it depends on. Not about code structure.
+name: generate-external-architecture-md
+description: Use when the user runs /generate-external-architecture-md — reads the project's data models, repositories, service layer, and runtime configuration to produce an architecture/External.md focused on what the system stores, where it stores it, what it caches, and what external services it depends on. Not about code structure.
 argument-hint: [project-directory]
 ---
 
-# uzaak: Generate Architecture.md
+# uzaak: Generate External Architecture
 
 Produce a runtime-focused `architecture/External.md` that answers: **what does this system do with data?** Document what is persisted where, what is cached, what external services are called, and how data flows through key operations. Do NOT document directory structure or coding patterns.
 
