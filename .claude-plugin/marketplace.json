@@ -22,9 +22,9 @@
       "source": "./plugins/githubzak"
     },
     {
-      "name": "flutter_skills",
-      "description": "Flutter skills — run, view, and interact with Flutter apps in the iOS simulator",
-      "source": "./plugins/flutter_skills"
+      "name": "flutter",
+      "description": "Flutter — run, view, and interact with Flutter apps in the iOS simulator",
+      "source": "./plugins/flutter"
     },
     {
       "name": "golang",
