@@ -38,6 +38,12 @@ ssh <host> "bash -li -c 'which claude' 2>/dev/null || find /usr/local/bin /home 
 - If a path is returned: use it as `host_claude_path`
 - If nothing is returned: print `Could not locate the claude binary on <host>. Install Claude Code there first.` and stop — do not write the config file.
 
+Generate a UUID for this config:
+
+```bash
+python3 -c "import uuid; print(uuid.uuid4())"
+```
+
 Then write `remote-me.json` to the **current working directory**:
 
 ```json
@@ -46,9 +52,18 @@ Then write `remote-me.json` to the **current working directory**:
   "host": "<host>",
   "project_dir": "<project_dir>",
   "host_claude_path": "<discovered_path>",
-  "session_id": null
+  "session_id": null,
+  "uuid": "<generated-uuid>",
+  "detached": true,
+  "dangerously_skip_permissions": true
 }
 ```
+
+- `uuid` — ties this config to its output file on the remote (`/tmp/remote-me-out-<uuid>.json`). Never changes after init.
+- `detached` — `true` runs Claude detached from the SSH session (robust against drops); `false` runs blocking. Default: `true`.
+- `dangerously_skip_permissions` — `true` passes `--dangerously-skip-permissions` to Claude, which is required for file-writing skills in non-interactive mode. Default: `true`.
+
+Both flags can be edited manually in the JSON at any time.
 
 Print: `SSH connection to <host> verified. claude found at <host_claude_path>. Config saved to ./remote-me.json`
 
@@ -81,34 +96,67 @@ Run `/remote-me init` to create one, or pass an explicit path: `/remote-me path/
 
 ### 2. Read config
 
-Parse the JSON. Extract: `host`, `project_dir`, `host_claude_path`, `session_id`.
+Parse the JSON. Extract: `host`, `project_dir`, `host_claude_path`, `session_id`, `uuid`, `detached`, `dangerously_skip_permissions`.
 
 If `host_claude_path` is missing or null: print `Config is missing host_claude_path. Re-run \`/remote-me init\` to regenerate it.` and stop.
 
-### 3. Build and run the SSH command
+If `uuid` is missing or null: print `Config is missing uuid. Re-run \`/remote-me init\` to regenerate it.` and stop.
 
-If `session_id` is null (first run):
+Treat missing `detached` as `true`. Treat missing `dangerously_skip_permissions` as `true`.
 
-```bash
-ssh <host> "cd <project_dir> && <host_claude_path> -p \"<prompt>\" --output-format json"
+### 3. Build the Claude command
+
+Escape the prompt: replace `"` with `\"`, `$` with `\$`, and backticks with `\``.
+
+Assemble the remote command:
+
+```
+<host_claude_path> -p "<escaped_prompt>" [--resume <session_id>] --output-format json [--dangerously-skip-permissions]
 ```
 
-If `session_id` has a value:
+- Include `-r <session_id>` only if `session_id` is non-null.
+- Include `--dangerously-skip-permissions` only if `dangerously_skip_permissions` is `true`.
+
+### 4a. Execute — detached mode (`detached: true`)
+
+Launch Claude on the remote, detached from the SSH session, writing output to a stable file keyed by UUID:
 
 ```bash
-ssh <host> "cd <project_dir> && <host_claude_path> -p \"<prompt>\" -r <session_id> --output-format json"
+ssh <host> "cd <project_dir> && nohup bash -c '<claude_command>' > /tmp/remote-me-out-<uuid>.json 2>/tmp/remote-me-err-<uuid>.txt & echo \$!"
 ```
 
-Capture stdout. If the SSH command itself fails (non-zero exit code): print the raw SSH error and stop — do not modify the config file.
+Capture the PID printed to stdout.
 
-Before embedding `<prompt>` in the command, escape any double-quote characters in the prompt text (replace `"` with `\"`). Prompts containing unescaped `"`, `$`, or backticks will break the SSH command.
+Poll every 30 seconds until the process exits:
 
-### 4. Parse the response
+```bash
+until ssh <host> "! kill -0 <pid> 2>/dev/null"; do sleep 30; done
+```
+
+If the poll SSH connection drops mid-wait, simply re-run `/remote-me` with the same prompt — the UUID is stable, and if the remote process already finished, Step 4b will find the output file immediately. If it is still running, a new PID will be captured and polling resumes.
+
+Once the process exits, fetch the output:
+
+```bash
+ssh <host> "cat /tmp/remote-me-out-<uuid>.json"
+```
+
+Leave the output file on the remote as a debug artefact. Proceed to Step 5.
+
+### 4b. Execute — blocking mode (`detached: false`)
+
+```bash
+ssh <host> "cd <project_dir> && <claude_command>"
+```
+
+Capture stdout directly. If the SSH command itself fails (non-zero exit code): print the raw SSH error and stop — do not modify the config file. Proceed to Step 5.
+
+### 5. Parse the response
 
 Parse captured stdout as JSON.
 
-- If parsing fails or `type` is not `"result"` (the JSON always contains a `type` field; successful responses have `type: "result"`): print the raw stdout as-is and stop. Do not modify the config.
-- If `is_error` is true: do not update session_id. Ask the user:
+- If parsing fails or `type` is not `"result"`: print the raw stdout as-is and stop. Do not modify the config.
+- If `is_error` is true: do not update `session_id`. Ask the user:
 
 ```
 Remote Claude returned an error: <result field content>
@@ -116,9 +164,9 @@ This may mean the session no longer exists on the remote.
 Would you like me to reset the session and retry your prompt fresh? (yes/no)
 ```
 
-If the user says yes: set `session_id` to null in the config file, then re-run the SSH command from Step 3 without `-r` (first-run form), and continue from Step 4 as normal. If this retry also returns `is_error: true`, do not offer to reset again — print the error and stop.
+If the user says yes: set `session_id` to null in the config file, then re-run the SSH command from Step 4 without `-r` (first-run form), and continue from Step 5 as normal. If this retry also returns `is_error: true`, do not offer to reset again — print the error and stop.
 
-### 5. Print and persist
+### 6. Print and persist
 
 Print the value of `result` to the screen.
 
