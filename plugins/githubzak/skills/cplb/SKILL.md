@@ -38,13 +38,15 @@ Write a meaningful commit message:
 
 **4. Commit**
 
+> **MANDATORY:** Every commit made by this skill MUST include the `Co-Authored-By` trailer. The `--trailer` flag enforces this structurally — never remove it.
+
 ```bash
-git commit -m "$(cat <<'EOF'
+git commit \
+  --trailer "Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>" \
+  -m "$(cat <<'EOF'
 <subject line>
 
 <optional body>
-
-Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>
 EOF
 )"
 ```
