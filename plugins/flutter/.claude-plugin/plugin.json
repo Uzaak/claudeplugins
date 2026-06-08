@@ -1,6 +1,6 @@
 {
-  "name": "flutter_skills",
-  "description": "flutter_skills plugin — iOS simulator skills for running, viewing, and interacting with Flutter apps",
+  "name": "flutter",
+  "description": "flutter plugin — iOS simulator skills for running, viewing, and interacting with Flutter apps",
   "author": {
     "name": "Tiago Furlanetto"
   }
