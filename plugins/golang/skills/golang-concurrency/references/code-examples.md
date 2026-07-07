@@ -1,19 +1,8 @@
----
-name: golang-uber-concurrency
-description: Use when writing goroutines, using sync primitives, channels, atomic operations, shared state, mutexes, or defer for cleanup in Go. Also use when reviewing concurrent code for leaks or race conditions.
----
+# Golang Concurrency — Code Examples
 
-# Golang Uber: Concurrency & Safety
+All snippets below are non-executable reference examples illustrating the rules in SKILL.md.
 
-## Overview
-
-Goroutines are not free. Leaked goroutines cause memory pressure, prevent GC, and hold resources. Every goroutine must have a controlled lifetime. Shared state must be protected without leaking synchronization details.
-
-## Don't Fire-and-Forget Goroutines
-
-Every goroutine must have:
-- A way to signal it to stop, AND
-- A way to wait for it to finish
+## Controllable Goroutine Lifetime (stop + done channels)
 
 ```go
 // BAD — no stop mechanism, runs until process exits
@@ -48,10 +37,7 @@ close(stop)
 <-done
 ```
 
-## Wait for Goroutines to Exit
-
-- **Multiple goroutines:** use `sync.WaitGroup`
-- **Single goroutine:** use `done chan struct{}` with `defer close(done)`
+## Wait with sync.WaitGroup
 
 ```go
 // Multiple
@@ -66,9 +52,7 @@ for i := 0; i < N; i++ {
 wg.Wait()
 ```
 
-## No Goroutines in `init()`
-
-Expose an object that manages the goroutine lifecycle instead:
+## No Goroutines in init() — Worker with Shutdown()
 
 ```go
 // BAD
@@ -92,9 +76,7 @@ func (w *Worker) Shutdown() {
 }
 ```
 
-## Use go.uber.org/atomic
-
-Raw `sync/atomic` operates on primitive types — easy to accidentally do non-atomic reads. Use `go.uber.org/atomic` for type safety:
+## go.uber.org/atomic — typed atomics
 
 ```go
 // BAD — race on read
@@ -109,9 +91,7 @@ func (f *foo) start() {
 }
 ```
 
-## Avoid Mutable Globals
-
-Use dependency injection instead:
+## Avoid Mutable Globals — inject dependencies
 
 ```go
 // BAD — hard to test, shared mutation
@@ -126,17 +106,13 @@ func (s *signer) Sign(msg string) string { now := s.now(); ... }
 
 ## Channel Size is One or None
 
-Default: unbuffered. Acceptable: size 1. Any other size requires documented justification.
-
 ```go
 c := make(chan int)    // unbuffered — preferred
 c := make(chan int, 1) // size 1 — acceptable
 c := make(chan int, 64) // BAD — requires explicit justification
 ```
 
-## Defer to Clean Up
-
-Always use `defer` for mutex unlocks and resource cleanup — prevents missed unlocks on multiple return paths:
+## Defer to Clean Up (mutex unlock)
 
 ```go
 // BAD — easy to miss unlock
@@ -161,8 +137,6 @@ return p.count
 ```
 
 ## Copy Slices and Maps at Boundaries
-
-Storing a reference allows callers to mutate internal state:
 
 ```go
 // BAD — caller can mutate d.trips
@@ -189,14 +163,10 @@ func (s *Stats) Snapshot() map[string]int {
 
 ## Zero-Value Mutexes
 
-`sync.Mutex` and `sync.RWMutex` zero values are valid — never use `new()`:
-
 ```go
 var mu sync.Mutex   // GOOD
 mu := new(sync.Mutex) // BAD
 ```
-
-**Never embed mutexes in structs** — it leaks `Lock()`/`Unlock()` as public API:
 
 ```go
 // BAD — Lock/Unlock become public
@@ -216,33 +186,3 @@ func (m *SMap) Get(k string) string {
     return m.data[k]
 }
 ```
-
-## Interface Compliance Verification
-
-For exported types that must implement an interface, verify at compile time:
-
-```go
-var _ http.Handler = (*Handler)(nil)   // pointer receiver
-var _ http.Handler = LogHandler{}      // value receiver
-```
-
-This fails at compile time if the interface is ever broken.
-
-## Receivers and Interfaces
-
-- Value receiver methods can be called on both values and pointers
-- Pointer receiver methods can only be called on pointers (or addressable values)
-- Map values are not addressable — store `map[int]*S` if you need pointer receivers
-
-## Common Mistakes
-
-| Mistake | Fix |
-|---|---|
-| `go func() { for { work() } }()` | Add `stop` channel + `done` channel |
-| `func init() { go doWork() }` | Expose `NewWorker()` with `Shutdown()` |
-| `atomic.AddInt32(&f.running, 1)` | Use `atomic.Bool` / `go.uber.org/atomic` |
-| `var _now = time.Now` then mutated in tests | Inject `now func() time.Time` via DI |
-| `make(chan int, 100)` | Use unbuffered or size-1; document if larger |
-| Embedding `sync.Mutex` in struct | Use explicit field `mu sync.Mutex` |
-| Returning `s.internalMap` directly | Copy before returning |
-| `mu := new(sync.Mutex)` | `var mu sync.Mutex` |

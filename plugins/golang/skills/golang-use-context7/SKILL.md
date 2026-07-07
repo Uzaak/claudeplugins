@@ -18,15 +18,21 @@ Always fetch up-to-date library documentation via Context7 before implementing a
 - Checking for breaking changes or deprecations
 - Understanding idiomatic usage patterns for a library
 
+## Rules
+
+- Resolve library ID first — don't guess the Context7 ID
+- Check version-specific changes — APIs differ between major versions
+- Prefer Context7 over any cached knowledge about the library
+
 ## Workflow
 
-```
+```text
 1. resolve-library-id  →  get the Context7-compatible library ID
 2. get-library-docs    →  fetch docs, specify topic if known
 3. implement           →  follow docs + project standards
 ```
 
-```
+```text
 Example:
 "I need to add rate limiting middleware to gin"
 
@@ -49,12 +55,6 @@ Example:
 | `kelseyhightower/envconfig` | Environment configuration |
 | `go.uber.org/zap` | High-performance structured logging |
 | `golang.org/x/sync/errgroup` | Goroutine synchronization |
-
-## Rules
-
-- Resolve library ID first — don't guess the Context7 ID
-- Check version-specific changes — APIs differ between major versions
-- Prefer Context7 over any cached knowledge about the library
 
 ## Common Mistakes
 

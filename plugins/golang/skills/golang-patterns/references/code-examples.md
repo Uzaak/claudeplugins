@@ -1,13 +1,8 @@
----
-name: golang-uber-patterns
-description: Use when writing Go tests (table-driven, parallel), designing public APIs with optional arguments, or setting up linting. Also use when choosing between multiple test cases vs a table test, or designing a constructor with 3+ optional parameters.
----
+# Golang Patterns — Code Examples
 
-# Golang Uber: Patterns, Performance & Linting
+All snippets below are non-executable reference examples illustrating the rules in SKILL.md.
 
-## Test Tables
-
-Use table-driven tests when the same logic runs against multiple inputs. Naming conventions are mandatory.
+## Table-Driven Test (naming conventions)
 
 ```go
 // Slice is named "tests", each case is "tt"
@@ -31,13 +26,7 @@ for _, tt := range tests {
 }
 ```
 
-### When NOT to Use Table Tests
-
-Split into separate `Test...` functions when:
-- You need conditional mock expectations (`if tt.shouldCallX`)
-- You have `setupMocks func(*FooMock)` fields in the table
-- You need multiple branching paths through the test body
-- Different cases require fundamentally different setup
+## When NOT to Use Table Tests
 
 ```go
 // BAD — conditional mock setup inside table
@@ -56,11 +45,7 @@ func TestShouldCallX(t *testing.T) {
 }
 ```
 
-Simple `wantErr bool` field for success/failure branching is acceptable.
-
-### Parallel Tests
-
-**Always** capture the loop variable before calling `t.Parallel()`:
+## Parallel Tests — capture loop variable
 
 ```go
 for _, tt := range tests {
@@ -72,11 +57,7 @@ for _, tt := range tests {
 }
 ```
 
-## Functional Options
-
-Use for constructors with optional arguments — especially when 3+ options exist or the API may expand.
-
-**Preferred implementation:** `Option` interface with unexported `apply(*options)` method (not closures — allows comparison in tests, can implement `fmt.Stringer`).
+## Functional Options — full implementation
 
 ```go
 type options struct {
@@ -105,7 +86,7 @@ func Open(addr string, opts ...Option) (*Connection, error) {
 }
 ```
 
-Usage is clean and self-documenting:
+## Functional Options — usage
 
 ```go
 db.Open(addr)
@@ -113,11 +94,7 @@ db.Open(addr, db.WithLogger(log))
 db.Open(addr, db.WithCache(false), db.WithLogger(log))
 ```
 
-## Performance
-
-Apply only in hot paths — premature optimization harms readability.
-
-### strconv over fmt for Primitive Conversions
+## strconv over fmt
 
 ```go
 // BAD — 143 ns/op
@@ -127,7 +104,7 @@ s := fmt.Sprint(rand.Int())
 s := strconv.Itoa(rand.Int())
 ```
 
-### Avoid Repeated String-to-Byte Conversions
+## Avoid Repeated String-to-Byte Conversions
 
 ```go
 // BAD — allocates []byte on every iteration
@@ -142,7 +119,7 @@ for i := 0; i < b.N; i++ {
 }
 ```
 
-### Specify Container Capacity
+## Specify Container Capacity
 
 ```go
 // Maps — capacity is a hint (not guaranteed preallocation)
@@ -154,28 +131,3 @@ for k := 0; k < size; k++ {
     data = append(data, k)
 }
 ```
-
-## Linting
-
-Run `golangci-lint` with these minimum linters:
-
-| Linter | Purpose |
-|---|---|
-| `errcheck` | Ensure errors are handled |
-| `goimports` | Format code and manage imports |
-| `golint` | Point out common style mistakes |
-| `govet` | Analyze code for common mistakes |
-| `staticcheck` | Static analysis checks |
-
-CI command: `golangci-lint run ./...`
-
-## Common Mistakes
-
-| Mistake | Fix |
-|---|---|
-| `shouldCallX bool` field in table test | Split into separate `TestX` functions |
-| `go func() { for _, tt := range tests { t.Parallel() } }` | `tt := tt` before `t.Parallel()` |
-| `func Open(addr string, cache bool, log *Logger)` with 3+ params | Use functional options |
-| `func WithFoo(x bool) Option { return func(o *opts) { o.foo=x } }` | Use interface-based option (allows comparison) |
-| `fmt.Sprint(rand.Int())` in hot path | `strconv.Itoa(rand.Int())` |
-| `data = append(data, item)` in loop without capacity | `make([]T, 0, expectedSize)` |
