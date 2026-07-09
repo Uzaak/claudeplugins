@@ -32,6 +32,11 @@
       "source": "./plugins/golang"
     },
     {
+      "name": "aegis",
+      "description": "Multi-agent development pipeline — 16 agents from PRD to approved delivery, plus orchestration skills",
+      "source": "./plugins/aegis"
+    },
+    {
       "name": "rote-management",
       "description": "rote-management — skills for managing rote adapters: creating new adapters from OpenAPI specs, generating subagents, and configuring auth",
       "source": "./plugins/rote-management"
