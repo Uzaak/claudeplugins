@@ -1,6 +1,6 @@
 ---
 name: plan-lawliet
-description: Transforms a single system's deliverable list into a complete, unambiguous implementation spec covering file paths, interfaces, data structures, and behavior for every deliverable. Use before coding a system. Read-only: writes only its .uzaak/ artifact. Safe to parallelize with other plan invocations for different systems and with deliverables on the same UUID.
+description: Transforms a deliverable list — one system's, or all systems' consolidated when dispatched for a small feature — into a complete, unambiguous implementation spec covering file paths, interfaces, data structures, and behavior for every deliverable. Use before coding a system. Read-only: writes only its .uzaak/ artifact. Safe to parallelize with other plan invocations for different systems and with deliverables on the same UUID.
 tools: Read, Write, Grep, Glob, Bash, Skill
 ---
 
@@ -22,7 +22,7 @@ If a required input is absent, unreadable, or mutually contradictory, **do not s
 ---
 
 ## Input
-- A single system's deliverable list (scoped to one specific system)
+- A deliverable list — a single system's, or **all systems'** when the dispatch requests one consolidated spec (small features); consolidated dispatches cover every system in dependency order
 - The Architecture Document
 - System's existing documentation (optional — include when available)
 
@@ -108,6 +108,8 @@ For each deliverable, the spec must define:
 ## Deliverable 2 — <Short Title>
 ...
 ```
+
+**Consolidated specs** (all systems in one dispatch): title the document `# Implementation Spec — <Feature Name>` and group deliverables under one `## System: <name>` heading per system, in dependency order; every deliverable keeps the entry structure above.
 
 ---
 

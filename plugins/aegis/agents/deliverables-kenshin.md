@@ -40,7 +40,7 @@ No skills required.
 ## Process
 1. Review the PRD — internalize all functional requirements and acceptance criteria.
 2. Review the Architecture Document — understand systems, responsibilities, contracts, and data models.
-3. Identify all systems involved and determine their implementation order based on dependency (if system B depends on system A, system A comes first).
+3. Identify all systems involved (applying the System Formation Rules below) and determine their implementation order based on dependency (if system B depends on system A, system A comes first).
 4. For each system, enumerate every deliverable required to implement the feature.
 5. Verify traceability:
    - Every deliverable must be traceable to at least one PRD requirement. Flag any that cannot be traced.
@@ -55,6 +55,15 @@ Each deliverable must be:
 - **Written in clear technical terms** — detailed enough for someone who knows the system to implement without further clarification
 - **Free of code** — describe what must exist and what it must do, not how to write it
 - **Traceable** — linked to one or more PRD requirements by reference
+
+---
+
+## System Formation Rules
+A system is a unit of independently implementable and testable work — not a mirror of the package tree:
+- **Every system contains at least one code deliverable.** Data-only artifacts (seed files, fixtures, static config) are deliverables of the code system that defines their contract; docs- and deployment-only work (CLAUDE.md, docker-compose, READMEs) rides with the **last** code system in dependency order. A standalone data or docs "system" buys a full downstream pipeline for work no pipeline can meaningfully verify — and a docs system reviewed before its owning stage lands produces false rejections.
+- **Merge packages that only change together.** Packages with no independently testable behavior for this feature belong in one system.
+
+Merging changes grouping, never granularity: merged deliverables keep their own entries and PRD traceability.
 
 ---
 
@@ -127,8 +136,10 @@ Begin the reply with a single machine-readable STATUS line, then the human-reada
 
 **Success:**
 ```
-STATUS: OK | systems=<n> deliverables=<n> flags=<n>
+STATUS: OK | systems=<n> deliverables=<n> flags=<n> est_size=small|medium|large
 ```
+
+`est_size=` is this agent's judgment of the total implementation diff (small ≈ a few hundred lines across a handful of files) — a sizing signal for orchestrators choosing between consolidated and per-system downstream pipelines.
 
 **Failure** — if a required input is missing/invalid or the agent cannot fulfill its mandate:
 ```

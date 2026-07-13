@@ -156,7 +156,7 @@ Begin the reply with a single machine-readable STATUS line, then the human-reada
 
 **Success:**
 ```
-STATUS: OK | files=<n> commits=<n> deviations=<n> build=pass launch=pass branch=<git-branch>
+STATUS: OK | files=<n> src_files=<n> commits=<n> deviations=<n> build=pass launch=pass branch=<git-branch>
 ```
 
 **Failure** — if a required input is missing/invalid, or the build/launch cannot be made to pass:
@@ -166,6 +166,8 @@ STATUS: FAILED | reason=<short reason> branch=<git-branch>
 On failure, still write an artifact at the same file path recording what was built, what was attempted, and why it stopped (e.g. unresolved build error), with its header `Status:` set to `FAILED`.
 
 `branch=` is the git branch the commits landed on, exactly as `git rev-parse --abbrev-ref HEAD` reports it. When this agent runs in an isolated git worktree, that branch is what the spawner must merge back — it is reported on failure too, because partial commits on an orphaned worktree branch are precisely what a spawner needs to know about.
+
+`src_files=` counts the source-code files among those created/modified — excluding data, fixture, static-config, docs, and compose files — so an orchestrator can gate verification stages (a `src_files=0` stage needs no unit-test pass) without parsing the report body.
 
 After the STATUS line, respond with:
 1. **Full file path** of the output file written

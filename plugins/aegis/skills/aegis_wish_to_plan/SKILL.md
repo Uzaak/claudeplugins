@@ -14,7 +14,8 @@ Turn a raw wish into implementation-ready specs by running the four aegis planni
 
 - The orchestrator never writes the PRD, architecture, deliverables, or specs itself. It routes artifacts by absolute path and gates on `STATUS:` lines — the agent definitions carry all process.
 - One UUID per run. Never regenerate it mid-run; agents correlate artifacts by it.
-- Stages 1–3 run sequentially, foreground — each consumes the previous artifact. Stage 4 (plan-lawliet) **may fan out in parallel**, one dispatch per system: all four agents are read-only and lawliet is explicitly parallel-safe across systems on the same UUID.
+- Stages 1–3 run sequentially, foreground — each consumes the previous artifact. Stage 4 (plan-lawliet) may fan out — lawliet is read-only and parallel-safe across systems on the same UUID — but **in waves of at most 3 concurrent dispatches**, each wave gated before the next. If the session has already consumed a large share of its budget (long conversation, prior heavy runs), run stage 4 sequentially instead: a batch killed by the session limit costs more in re-dispatch and recovery triage than a staggered rollout.
+- **Failure recovery is artifact-first.** On any agent failure — killed mid-flight, tool error, empty reply, or no parseable `STATUS:` line — read the newest `.uzaak/<agent>-<uuid>-*.md` **before** considering re-dispatch: header `Status: OK` means the work completed and only the chat reply was lost. Re-dispatch is the last resort.
 - The operating mode (Default or Silent) binds only prd-chihiro and architecture-kayaba — the other two never ask questions. Every dispatch to those two states the mode explicitly.
 - **Question relay (Default mode):** a reply from chihiro or kayaba that does not begin with `STATUS:` is a round of clarifying questions. Relay them to the user verbatim, then return the answers to the **same agent** via SendMessage so it keeps its context. Maximum two rounds per agent; on a third questioning reply, respond "No further answers — proceed and document your assumptions."
 - **Silent mode:** never relay questions; agents resolve ambiguity themselves and document assumptions.
@@ -22,7 +23,7 @@ Turn a raw wish into implementation-ready specs by running the four aegis planni
 - Dispatch prompts carry artifact file paths, never pasted artifact contents.
 - Environment: `git` and `uuidgen`. No Docker needed — planners never boot the app.
 
-**Dispatch prompt recipe** — each prompt is exactly: (1) the run UUID, (2) the operating mode (chihiro and kayaba only), (3) each input artifact as an absolute path labeled by artifact type, (4) inline parameters where the agent requires them (systems + languages list; target system name), (5) the repo root, (6) "Begin your reply with your STATUS line" — for chihiro and kayaba in Default mode, "…or with your clarifying questions." Nothing else.
+**Dispatch prompt recipe** — each prompt is exactly: (1) the run UUID, (2) the operating mode (chihiro and kayaba only), (3) each input artifact as an absolute path labeled by artifact type (including a pipeline state note path labeled "pipeline state note — expected conditions, not defects", when the orchestrator maintains one), (4) inline parameters where the agent requires them (systems + languages list; target system name), (5) the repo root, (6) "Begin your reply with your STATUS line" — for chihiro and kayaba in Default mode, "…or with your clarifying questions." Nothing else.
 
 ## Step 0 — Capture the wish and choose the mode
 
@@ -56,9 +57,10 @@ Dispatch `aegis:deliverables-kenshin` with the PRD and architecture paths. Gate:
 
 ## Step 5 — Implementation specs (fan-out)
 
-1. From the deliverables document, list the systems. Dispatch one `aegis:plan-lawliet` per system — in parallel when there are several. Each prompt carries: the target system name, the deliverables path (labeled "deliverable list — scope to your system"), the architecture path, and any existing system documentation paths.
-2. Gate each on `STATUS: OK`, then verify **one plan artifact per system** exists in `.uzaak/plan-<uuid>-*.md` — parallel writers can collide on a same-second filename. Re-dispatch lawliet for any system whose artifact is missing.
+1. **Complexity gate first:** read `systems=`, `deliverables=`, and `est_size=` from kenshin's STATUS. When total deliverables ≤ 8 or `est_size=small`, dispatch **one** plan-lawliet for the whole feature — its prompt carries the deliverables path labeled "deliverable list — all systems, produce one consolidated spec in dependency order", the architecture path, and any existing documentation paths. The single spec feeds one aegis_simple_code run. The threshold is a heuristic, not a law: nine trivial deliverables still merit one spec.
+2. Above the gate: from the deliverables document, list the systems. Dispatch one `aegis:plan-lawliet` per system — in waves per the Rules. Each prompt carries: the target system name, the deliverables path (labeled "deliverable list — scope to your system"), the architecture path, and any existing system documentation paths.
+3. Gate each on `STATUS: OK`, then verify **one plan artifact per dispatch** exists in `.uzaak/plan-<uuid>-*.md` — parallel writers can collide on a same-second filename. Apply artifact-first recovery per the Rules; re-dispatch lawliet only for a system with no `Status: OK` artifact on disk.
 
 ## Step 6 — Report
 
-Final message to the user: every artifact path (wish, PRD, architecture, deliverables, one plan per system), requirement/criteria/deliverable counts, evidence quality and open questions from the PRD, traceability flags if any, and the note that each plan artifact is a ready implementation spec for `code-kazuto` (e.g. via the aegis_simple_code pipeline).
+Final message to the user: every artifact path (wish, PRD, architecture, deliverables, one plan per system — or the single consolidated plan), requirement/criteria/deliverable counts, evidence quality and open questions from the PRD, traceability flags if any, and the note that each plan artifact is a ready implementation spec for `code-kazuto` (e.g. via the aegis_simple_code pipeline).

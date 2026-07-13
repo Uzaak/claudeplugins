@@ -44,16 +44,28 @@ Before producing section 6 (Acceptance Criteria), invoke any available skills re
 
 ## Process
 1. Parse and analyze all provided input — identify goals, constraints, actors, and implied requirements.
-2. Surface contradictions and implicit assumptions found in the input.
-3. *(Default mode only)* Ask round 1 of clarifying questions. Wait for response.
-4. *(Default mode only)* Ask round 2 of clarifying questions. Wait for response. Proceed independently after this.
-5. Invoke Gherkin/acceptance criteria skills before drafting section 6.
-6. Produce all 7 PRD sections as defined below.
-7. Document every assumption made (regardless of operating mode) in section 7.
+2. Assess evidence quality **now** — strong / medium / weak, per the section 7 scale — and select the document form per Ceremony Scaling below.
+3. Surface contradictions and implicit assumptions found in the input.
+4. *(Default mode only)* Ask round 1 of clarifying questions. Wait for response.
+5. *(Default mode only)* Ask round 2 of clarifying questions. Wait for response. Proceed independently after this.
+6. Invoke Gherkin/acceptance criteria skills before drafting the acceptance criteria.
+7. Produce the PRD in the selected form.
+8. Document every assumption made (regardless of operating mode) in section 7.
 
 ---
 
-## Document Structure
+## Ceremony Scaling
+
+The evidence tier selects the document form — a weak-evidence wish must not fan out into full-ceremony downstream work:
+
+- **Compact PRD** — when evidence is **weak** (anecdotal, internal perception, single stakeholder) **and** the wish is internal-facing (developer experience, tooling, configuration): Section 1 in full; Sections 2–3 merged into one short goals/non-goals paragraph; Section 4 as a flat requirements list covering the happy path plus only the edge cases that plausibly apply to this feature — skip the per-requirement edge-case enumeration; Section 5 only where a real constraint exists; Section 6 as Gherkin for the happy path and genuinely risky edges only; Section 7 in full.
+- **Full PRD** — all 7 sections as defined below, whenever evidence is medium or strong, or the feature is product-facing.
+
+Both forms use the same STATUS shape; `evidence=` reports the tier that drove the choice.
+
+---
+
+## Document Structure (full form)
 
 ### Section 1 — Overview
 What is being built and why.
@@ -139,7 +151,7 @@ $(git rev-parse --path-format=absolute --git-common-dir)/../.uzaak/
 This yields the main checkout's repo root from a linked worktree and the ordinary repo root otherwise, so it is always safe to use. Outside any git repository, fall back to `./.uzaak/`.
 
 ### File Contents
-The complete PRD — all 7 sections fully populated.
+The complete PRD in the form Ceremony Scaling selected — compact, or all 7 sections fully populated.
 
 The file must be fully self-contained. A reader with no prior context must be able to understand exactly what was produced without access to any other file or conversation.
 
