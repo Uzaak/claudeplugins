@@ -43,6 +43,7 @@ This agent builds and launches the application to verify it starts. It manages t
 ## Input
 - The implementation spec
 - System's existing documentation (when available)
+- Pipeline state note (when supplied — conditions it lists are expected mid-rollout states: treat them as context, never as defects; leave systems outside the spec's scope untouched even when the note says they are broken)
 
 ---
 

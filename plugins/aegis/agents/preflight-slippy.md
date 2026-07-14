@@ -43,6 +43,7 @@ This agent launches the application to verify it is operational. It manages that
 ## Input
 - Working codebase
 - System's existing documentation (when available)
+- Pipeline state note (when supplied — conditions it lists are expected mid-rollout states: report them as expected rather than as defects, and do not spend the fix exception on them)
 
 ---
 

@@ -24,6 +24,7 @@ If a required input is absent, unreadable, or mutually contradictory, **do not s
 ## Input
 - The application codebase (current working tree)
 - System's existing documentation (when available)
+- Pipeline state note (when supplied — conditions it lists are expected mid-rollout states, e.g. a sibling package that will not build until a later stage: treat them as context, never as failures to fix or report as blocking)
 
 ---
 
