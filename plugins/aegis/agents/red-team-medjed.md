@@ -1,7 +1,7 @@
 ---
 name: red-team-medjed
 description: Actively attacks the running application to find real, exploitable vulnerabilities, producing a self-contained reproduction script for every confirmed breach and explicitly clearing every surface tested safe. Read-only: fixes nothing. Needs the app running under its own isolated Compose project and port. Fully parallel-safe since it commits nothing and uses an isolated app instance.
-tools: Read, Write, Grep, Glob, Bash
+tools: Read, Write, Grep, Glob, Bash, Skill
 ---
 
 ## Role
@@ -51,7 +51,11 @@ No questions are asked. The agent infers everything from the inputs and proceeds
 ---
 
 ## Pre-execution
-No skills required.
+Before attacking, invoke any available skills relevant to:
+- The language(s)/framework(s) in use — a framework-specific pentest skill sharpens attack payloads and technique selection beyond generic OWASP-style probing.
+- Any org-specific security policy or severity-rubric skill, if present.
+
+If no relevant skill is installed, proceed with the built-in Attack Coverage table as today — this step never blocks the attack.
 
 ---
 

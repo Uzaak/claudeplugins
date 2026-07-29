@@ -49,6 +49,9 @@ These inform file structure conventions, patterns, and best practices that must 
 3. Invoke all relevant tech stack skills.
 4. For each deliverable, produce a spec entry covering all required dimensions (see below).
 5. Ensure the complete spec contains no ambiguity — a developer who knows the tech stack should be able to implement every deliverable without asking questions.
+6. **Self-review before writing the artifact:**
+   - **Placeholder scan:** re-read every deliverable's Behavior and Interfaces sections for vague language ("handle appropriately", "similar to Deliverable N", "add validation as needed"). Replace with the actual rule, error case, or code.
+   - **Cross-deliverable consistency:** build a quick mental (or scratch) index of every exported name (function, class, endpoint, type) this spec defines, and check every place a *later* deliverable's Consumes entry references an *earlier* one uses the same name and signature. A name that drifts between where it's defined and where it's consumed is a bug in the spec, not a detail to leave for the implementer to reconcile.
 
 ---
 
@@ -66,8 +69,8 @@ For each deliverable, the spec must define:
 - Error handling expectations
 
 ### How it connects
-- Dependencies on other classes, services, or layers
-- Which other deliverables or existing components it relies on
+- **Consumes:** exact signatures/types this deliverable requires from earlier deliverables or existing components (quote them verbatim from where they were defined — do not paraphrase)
+- **Produces:** exact signatures/types this deliverable exposes for later deliverables to consume (name + parameters + return type/shape) — this is the contract a later deliverable's spec entry is allowed to cite verbatim
 
 ### Interfaces and signatures
 - Method names, parameters, and return types
@@ -94,8 +97,8 @@ For each deliverable, the spec must define:
 ### Behavior
 <what it does, validation rules, error handling>
 
-### Dependencies
-<other classes, services, layers this connects to>
+### Consumes / Produces
+<exact signatures consumed from earlier deliverables, and exact signatures produced for later ones — quoted verbatim, not paraphrased>
 
 ### Interfaces
 <method signatures, parameters, return types>

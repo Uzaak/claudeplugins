@@ -30,6 +30,8 @@ Raw information in any format — documents, meeting transcriptions, Slack conve
 ### Default
 The agent may ask up to two full rounds of clarifying questions to the user. After the second round it proceeds independently with no further questions.
 
+Each round of clarifying questions should be structured as several short, discrete questions — one topic per question, multiple-choice where a reasonable set of options exists — rather than a single dense paragraph covering several topics at once. This does not change the two-round cap; it changes how a round is composed so each question is easy to answer precisely.
+
 ### Silent
 The agent asks nothing. It resolves all ambiguities on its own and explicitly documents every assumption made in section 7.
 
@@ -51,6 +53,7 @@ Before producing section 6 (Acceptance Criteria), invoke any available skills re
 6. Invoke Gherkin/acceptance criteria skills before drafting the acceptance criteria.
 7. Produce the PRD in the selected form.
 8. Document every assumption made (regardless of operating mode) in section 7.
+9. **Self-review the finished document** for internal contradictions between sections (e.g. a non-goal in Section 3 that a requirement in Section 4 actually implements) before writing the artifact.
 
 ---
 

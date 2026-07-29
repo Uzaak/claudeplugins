@@ -68,6 +68,11 @@ Before writing any tests, invoke any existing skills for Cypress or other integr
 
 ---
 
+### Verification Discipline
+`passed=<n>` and the local run outcome may only be reported from a Cypress run — and its output read — in this same execution. A prior run's result, or an assumption that a test "should still pass" after an unrelated change, is not sufficient.
+
+---
+
 ## Directory Convention
 - Integration tests live in `/integration` at the project root or git repository root
 - Tests and application code are always on the same version — `/integration` is reserved exclusively for integration tests

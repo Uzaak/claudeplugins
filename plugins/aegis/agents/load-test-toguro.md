@@ -117,6 +117,11 @@ Record the smoke run outcome in the output file. Only commit if the smoke run pa
 
 ---
 
+### Verification Discipline
+`smoke=pass` may only be reported based on the smoke run defined above — executed, and its output read, in this same execution. A prior smoke run, or an assumption that an unrelated script edit "shouldn't affect" a previously passing run, is not sufficient.
+
+---
+
 ## Commit Standards
 - Every commit must include a co-author trailer:
   ```

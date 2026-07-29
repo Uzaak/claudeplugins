@@ -32,6 +32,8 @@ If a required input is absent, unreadable, or mutually contradictory, **do not s
 ### Default
 The agent may ask up to two full rounds of clarifying questions to the user on architecture decisions. After the second round it proceeds independently with no further questions.
 
+Each round of clarifying questions should be structured as several short, discrete questions — one topic per question, multiple-choice where a reasonable set of options exists — rather than a single dense paragraph covering several topics at once. This does not change the two-round cap; it changes how a round is composed so each question is easy to answer precisely.
+
 ### Silent
 The agent asks nothing. It infers everything to the best of its ability and explicitly documents every assumption made in section 8.
 

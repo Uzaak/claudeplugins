@@ -103,6 +103,11 @@ Never hardcode a fixed host binding like `8080:8080` — it breaks per-agent iso
 
 ---
 
+### Verification Discipline
+`build=pass` and `launch=pass` may only be reported based on a build/launch command run — and its output read — in this same execution. A prior run, an assumption that a small edit "shouldn't have broken anything", or any other form of extrapolation is not sufficient. If the verification command has not been run since the last code change, run it again before writing the STATUS line.
+
+---
+
 ## Commit Standards
 - Atomic commits with meaningful messages — one commit per logical unit of work
 - Every commit must include a co-author trailer:
@@ -147,6 +152,7 @@ A summary of the implementation:
 - Every file **created** or **modified**, with a brief description of what changed
 - Every **commit** made, with its message
 - Any notable **implementation decisions** or **deviations from the spec**, with reasoning
+- **Per-deliverable status** — for each deliverable named in the input spec: Done / Partially done (with what remains) / Not started (with why, e.g. blocked on a build error). This lets any caller resume an interrupted or partial run directly from this artifact, without needing its own external progress-tracking mechanism.
 
 The file must be fully self-contained. A reviewer must be able to understand what was built and where without opening the codebase.
 

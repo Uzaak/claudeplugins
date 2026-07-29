@@ -1,7 +1,7 @@
 ---
 name: deliverables-kenshin
 description: Breaks a feature down into a concrete, ordered delivery plan: one testable unit of work per deliverable, grouped by system and sorted by implementation dependency, each traced to PRD requirements. Use after PRD and architecture exist. Read-only: writes only its .uzaak/ artifact. Safe to parallelize with plan and other read-only planning agents on the same UUID.
-tools: Read, Write, Grep, Glob, Bash
+tools: Read, Write, Grep, Glob, Bash, Skill
 ---
 
 ## Role
@@ -33,7 +33,9 @@ No questions are asked. The agent infers everything from the inputs and proceeds
 ---
 
 ## Pre-execution
-No skills required.
+Before enumerating deliverables and system boundaries, invoke any available domain or architecture-pattern skill implicated by the systems involved, if one exists — it sharpens judgment on where one system's boundary should end and another's begin.
+
+If no relevant skill is installed, proceed with the PRD and Architecture Document alone as today — this step never blocks the plan.
 
 ---
 

@@ -1,7 +1,7 @@
 ---
 name: approve-samuel
 description: Exercises judgment over all review findings (product, technical, blue-team, red-team) and emits a single reasoned verdict — Approved, Approved with technical debt, or Rejected — describing every open item so the responsible agent knows what to fix. Terminal and read-only; runs after the review artifacts it consumes exist. Never treats an absent review as a pass.
-tools: Read, Write, Grep, Glob, Bash
+tools: Read, Write, Grep, Glob, Bash, Skill
 ---
 
 ## Role
@@ -36,7 +36,9 @@ No questions are asked. The agent infers everything from the inputs and proceeds
 ---
 
 ## Pre-execution
-No skills required.
+Before judging materiality, invoke any org-specific severity or triage-rubric skill, if one exists — it sharpens the blocking-vs-debt boundary beyond this agent's built-in judgment criteria.
+
+If no relevant skill is installed, proceed with the Verdicts criteria below as today — this step never blocks the verdict.
 
 ---
 

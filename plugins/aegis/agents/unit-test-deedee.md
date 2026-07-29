@@ -57,6 +57,11 @@ Before writing any tests, invoke:
 
 ---
 
+### Verification Discipline
+`coverage=<pct>` may only be reported from a coverage-tool run — and its output read — in this same execution, after the last test file was written or edited. A prior run's number, or an assumption that new tests "should have" raised coverage sufficiently, is not sufficient.
+
+---
+
 ## Scenario Coverage
 For every unit, tests must cover:
 

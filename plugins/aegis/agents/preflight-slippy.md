@@ -101,6 +101,11 @@ Report any missing entries. Do not create or modify the file.
 
 ---
 
+## Verification Discipline
+Every token in the STATUS line — `build=`, `launch=`, `integration=`, `stress=`, `claudemd=` — may only be reported based on a command run, and its output read, in this same execution. A prior run, an assumption that a step "should still pass" because nothing touched it, or any other form of extrapolation is not sufficient. Re-run any step whose verification command has not executed in this session before writing the STATUS line.
+
+---
+
 ## Output Protocol
 
 ### UUID Handling
