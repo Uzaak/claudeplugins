@@ -89,10 +89,11 @@ Repeat this cycle for every unit of implementation.
 
 ---
 
-## Build and Launch Requirement
+## Build, Launch, and Test Requirement
 Before completing, verify in order:
 1. **The application builds with no errors** — run the project's build tool (e.g. `go build`, `mvn package`, `gradle build`, `npm run build`, `cargo build`). A build failure is a blocking error; do not conclude until it is resolved.
 2. **The application starts** — launched per **Application Lifecycle** (own Compose project + own port) and confirmed healthy.
+3. **The project's test suite passes when run via its own officially documented command** — not an equivalent substitute, not a single test file, and not inferred from the RED-GREEN-REFACTOR cycles having each ended green individually. A cycle-by-cycle green trail does not guarantee the aggregate suite is green: bugs like cross-test state leakage or ordering dependencies only surface when the suite runs together, in the order and grouping the documented command actually uses. Locate the documented command from the project's own CLAUDE.md (or equivalent root documentation) for every system touched by this run's deliverables — a Go backend and a TypeScript frontend in the same feature each have their own documented command, and both must be run — and run it fresh, after all deliverables are complete, as a distinct final step. A failure here is exactly as disqualifying as a build failure, and must be resolved (or, if truly out of this run's scope, explicitly reported as a known-failing deviation) before `STATUS: OK` is returned.
 
 ### Compose Port Contract
 The `app` service in `docker-compose.yml` MUST publish its port as `"${APP_PORT:-8080}:8080"` (substitute the app's real container port for `8080`). This:
@@ -104,7 +105,7 @@ Never hardcode a fixed host binding like `8080:8080` — it breaks per-agent iso
 ---
 
 ### Verification Discipline
-`build=pass` and `launch=pass` may only be reported based on a build/launch command run — and its output read — in this same execution. A prior run, an assumption that a small edit "shouldn't have broken anything", or any other form of extrapolation is not sufficient. If the verification command has not been run since the last code change, run it again before writing the STATUS line.
+`build=pass`, `launch=pass`, and `tests=pass` may only be reported based on a build/launch/test command run — and its output read — in this same execution. A prior run, an assumption that a small edit "shouldn't have broken anything", or any other form of extrapolation is not sufficient. If a verification command has not been run since the last code change, run it again before writing the STATUS line.
 
 ---
 
@@ -163,7 +164,7 @@ Begin the reply with a single machine-readable STATUS line, then the human-reada
 
 **Success:**
 ```
-STATUS: OK | files=<n> src_files=<n> commits=<n> deviations=<n> build=pass launch=pass branch=<git-branch>
+STATUS: OK | files=<n> src_files=<n> commits=<n> deviations=<n> build=pass launch=pass tests=pass branch=<git-branch>
 ```
 
 **Failure** — if a required input is missing/invalid, or the build/launch cannot be made to pass:

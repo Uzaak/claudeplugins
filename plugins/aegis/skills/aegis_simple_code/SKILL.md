@@ -52,7 +52,7 @@ One Agent tool call per stage, per the Rules above. Stages 1–2 repeat per spec
 
 | # | subagent_type | Prompt carries | Gate to proceed |
 |---|---|---|---|
-| 1 | `aegis:code-kazuto` | UUID + spec path (labeled "implementation spec") + state note path | `STATUS: OK` with `build=pass launch=pass` |
+| 1 | `aegis:code-kazuto` | UUID + spec path (labeled "implementation spec") + state note path | `STATUS: OK` with `build=pass launch=pass tests=pass` |
 | 2 | `aegis:unit-test-deedee` | UUID + "codebase = current working tree" + state note path | `STATUS: OK` with `coverage` ≥ 85 — unless skipped (below) |
 | 3 | `aegis:technical-review-lucca` | UUID + architecture input (below) + state note path | `STATUS: OK` |
 | 4 | `aegis:approve-samuel` | UUID + technical-review report path (labeled "technical review report") | `STATUS: OK` (any verdict) |

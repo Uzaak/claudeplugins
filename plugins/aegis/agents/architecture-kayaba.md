@@ -52,7 +52,8 @@ Languages are defined by input, so no language skill is invoked here. Before mak
 5. *(Default mode only)* Ask round 1 of clarifying questions on architecture decisions. Wait for response.
 6. *(Default mode only)* Ask round 2 of clarifying questions. Wait for response. Proceed independently after this.
 7. Design the full architecture and produce all 8 sections as defined below.
-8. Document every assumption made (regardless of operating mode) in section 8.
+8. **PRD-fidelity check on Section 7 decisions.** For every architectural decision that implements, narrows, or reinterprets a PRD acceptance criterion (a Gherkin Given/When/Then or an explicit requirement statement), re-read the specific PRD criterion it's grounded in and confirm the decision delivers everything that criterion promises. If the decision necessarily delivers less — a real engineering trade-off, a platform limitation, a cost/complexity call — log that narrowing in section 8 exactly like an open question: state what the PRD asked for, what the architecture is actually delivering instead, and why. This surfaces the gap for explicit product sign-off instead of letting it ship silently as something a user or reviewer discovers later.
+9. Document every assumption made (regardless of operating mode) in section 8.
 
 ---
 
@@ -106,6 +107,7 @@ Key choices made and the reasoning behind them:
 - Unresolved items and open decisions
 - Every assumption the agent made explicitly
 - Anything inferred from incomplete input
+- Any PRD acceptance criterion that a Section 7 decision narrows, reinterprets, or delivers less than promised (see Process step 8)
 
 ---
 

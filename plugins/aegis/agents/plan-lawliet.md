@@ -52,6 +52,7 @@ These inform file structure conventions, patterns, and best practices that must 
 6. **Self-review before writing the artifact:**
    - **Placeholder scan:** re-read every deliverable's Behavior and Interfaces sections for vague language ("handle appropriately", "similar to Deliverable N", "add validation as needed"). Replace with the actual rule, error case, or code.
    - **Cross-deliverable consistency:** build a quick mental (or scratch) index of every exported name (function, class, endpoint, type) this spec defines, and check every place a *later* deliverable's Consumes entry references an *earlier* one uses the same name and signature. A name that drifts between where it's defined and where it's consumed is a bug in the spec, not a detail to leave for the implementer to reconcile.
+   - **Reference-code self-consistency:** for any deliverable that bundles a literal reference implementation together with a literal reference test (or example usage) for that same function/component, mentally trace the test's inputs through the reference implementation line-by-line — or, if `Bash` is available and the tech stack permits it cheaply, actually paste both into a scratch file and run it — before including either in the spec. A bundled test that would fail against its own bundled implementation is a defect in the spec, not a detail for the coder to reconcile silently; a coder following the spec faithfully should not be the one who discovers it in production.
 
 ---
 
