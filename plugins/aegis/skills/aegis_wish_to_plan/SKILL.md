@@ -17,7 +17,7 @@ Turn a raw wish into implementation-ready specs by running the four aegis planni
 - Stages 1–3 run sequentially, foreground — each consumes the previous artifact. Stage 4 (plan-lawliet) may fan out — lawliet is read-only and parallel-safe across systems on the same UUID — but **in waves of at most 3 concurrent dispatches**, each wave gated before the next. If the session has already consumed a large share of its budget (long conversation, prior heavy runs), run stage 4 sequentially instead: a batch killed by the session limit costs more in re-dispatch and recovery triage than a staggered rollout.
 - **Failure recovery is artifact-first.** On any agent failure — killed mid-flight, tool error, empty reply, or no parseable `STATUS:` line — read the newest `.uzaak/<agent>-<uuid>-*.md` **before** considering re-dispatch: header `Status: OK` means the work completed and only the chat reply was lost. Re-dispatch is the last resort.
 - The operating mode (Default or Silent) binds only prd-chihiro and architecture-kayaba — the other two never ask questions. Every dispatch to those two states the mode explicitly.
-- **Question relay (Default mode):** a reply from chihiro or kayaba that does not begin with `STATUS:` is a round of clarifying questions. Relay them to the user verbatim, then return the answers to the **same agent** via SendMessage so it keeps its context. Maximum two rounds per agent; on a third questioning reply, respond "No further answers — proceed and document your assumptions."
+- **Question relay (Default mode):** the two rounds are mandatory for chihiro and kayaba, not optional — a first reply that already begins with `STATUS:` (skipping both rounds) violates their contract; re-dispatch with an explicit reminder that both rounds are required. A reply that does not begin with `STATUS:` is a round of clarifying questions: relay them to the user verbatim, then return the answers to the **same agent** via SendMessage so it keeps its context. Exactly two rounds per agent; on a third questioning reply, respond "No further answers — proceed and document your assumptions."
 - **Silent mode:** never relay questions; agents resolve ambiguity themselves and document assumptions.
 - `STATUS: FAILED` from any agent ends the run. Report the stage, its `reason=`, and its artifact path.
 - Dispatch prompts carry artifact file paths, never pasted artifact contents.
@@ -28,7 +28,7 @@ Turn a raw wish into implementation-ready specs by running the four aegis planni
 ## Step 0 — Capture the wish and choose the mode
 
 - No wish provided → ask for one. Accept freeform text, file paths, or transcripts.
-- Mode: if the invocation states it ("silent", "don't ask questions", "interactive") → use it. Otherwise ask the user one question: **Default** (agents may ask up to two rounds of clarifying questions — better-grounded documents) or **Silent** (fully autonomous — every ambiguity becomes a documented assumption).
+- Mode: if the invocation states it ("silent", "don't ask questions", "interactive") → use it. Otherwise ask the user one question: **Default** (agents always ask two rounds of clarifying questions before writing — better-grounded documents) or **Silent** (fully autonomous — every ambiguity becomes a documented best-guess assumption).
 
 ## Step 1 — Set up the run
 
@@ -44,7 +44,7 @@ Turn a raw wish into implementation-ready specs by running the four aegis planni
 
 ## Step 2 — PRD
 
-Dispatch `aegis:prd-chihiro` with the wish artifact (labeled "raw input"). Apply the question-relay rule. Gate: `STATUS: OK`. Record the PRD path and its `open_questions=` / `evidence=` values for the final report.
+Dispatch `aegis:prd-chihiro` with the wish artifact (labeled "raw input"). Apply the question-relay rule. Gate: `STATUS: OK`. Record the PRD path and its `assumptions=` / `evidence=` values for the final report.
 
 ## Step 3 — Architecture
 
@@ -63,4 +63,4 @@ Dispatch `aegis:deliverables-kenshin` with the PRD and architecture paths. Gate:
 
 ## Step 6 — Report
 
-Final message to the user: every artifact path (wish, PRD, architecture, deliverables, one plan per system — or the single consolidated plan), requirement/criteria/deliverable counts, evidence quality and open questions from the PRD, traceability flags if any, and the note that each plan artifact is a ready implementation spec for `code-kazuto` (e.g. via the aegis_simple_code pipeline).
+Final message to the user: every artifact path (wish, PRD, architecture, deliverables, one plan per system — or the single consolidated plan), requirement/criteria/deliverable counts, evidence quality and recorded assumptions from the PRD, traceability flags if any, and the note that each plan artifact is a ready implementation spec for `code-kazuto` (e.g. via the aegis_simple_code pipeline).

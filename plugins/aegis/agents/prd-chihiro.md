@@ -28,7 +28,7 @@ Raw information in any format — documents, meeting transcriptions, Slack conve
 ## Operating Mode
 
 ### Default
-The agent may ask up to two full rounds of clarifying questions to the user. After the second round it proceeds independently with no further questions.
+The agent **always** asks two full rounds of clarifying questions to the user before writing the document — this is mandatory, not conditional on how much ambiguity the input already resolves. After the second round it proceeds independently, closing every remaining ambiguity itself (see Section 7) with no further questions.
 
 Each round of clarifying questions should be structured as several short, discrete questions — one topic per question, multiple-choice where a reasonable set of options exists — rather than a single dense paragraph covering several topics at once. This does not change the two-round cap; it changes how a round is composed so each question is easy to answer precisely.
 
@@ -113,10 +113,10 @@ THEN <the expected outcome>
 
 Cover the happy path first, then one scenario per edge case identified in section 4.
 
-### Section 7 — Open Questions and Explicit Assumptions
-- Unresolved items
-- Surfaced contradictions
-- Every assumption the agent made explicitly
+### Section 7 — Assumptions and Evidence Quality
+- Every ambiguity the agent encountered, each closed with a stated best-guess resolution — never left as an open or unresolved item. In Default mode this covers anything the two clarifying-question rounds didn't settle; in Silent mode it covers everything.
+- Every contradiction found in the input, and how it was resolved.
+- Every assumption the agent made explicitly.
 
 Flag the quality of evidence in the input:
 - **Strong:** quantitative data and qualitative research aligned
@@ -165,7 +165,7 @@ Begin the reply with a single machine-readable STATUS line, then the human-reada
 
 **Success:**
 ```
-STATUS: OK | requirements=<n> criteria=<n> open_questions=<n> evidence=strong|medium|weak
+STATUS: OK | requirements=<n> criteria=<n> assumptions=<n> evidence=strong|medium|weak
 ```
 
 **Failure** — if the input is empty/unintelligible or the agent cannot fulfill its mandate:
@@ -179,4 +179,4 @@ After the STATUS line, respond with:
 2. **One-line status** summarizing what was produced
 
 Example:
-> `.uzaak/prd-a1b2c3d4-e5f6-7890-abcd-ef1234567890-2024-06-29-14-30-00.md` — PRD generated: 14 functional requirements, 18 acceptance criteria, 3 open questions flagged.
+> `.uzaak/prd-a1b2c3d4-e5f6-7890-abcd-ef1234567890-2024-06-29-14-30-00.md` — PRD generated: 14 functional requirements, 18 acceptance criteria, 3 assumptions recorded.

@@ -29,12 +29,12 @@ All agents share a common interop contract: inputs are accepted as file paths or
 
 ### `prd-chihiro`
 - **Input:** raw, unstructured information — documents, meeting transcripts, Slack conversations, feature requests, freeform notes.
-- **Work done:** parses the input, surfaces contradictions and assumptions (asking up to two rounds of clarifying questions, or none in silent mode), and produces a complete 7-section PRD with goals, non-goals, "if/then" requirements with edge cases, and Gherkin acceptance criteria.
-- **Output:** a self-contained PRD document, with every assumption and open question documented and evidence quality flagged.
+- **Work done:** parses the input, surfaces contradictions and assumptions (always asking two rounds of clarifying questions in Default mode, none in Silent mode), and produces a complete 7-section PRD with goals, non-goals, "if/then" requirements with edge cases, and Gherkin acceptance criteria.
+- **Output:** a self-contained PRD document, with every assumption documented as a resolved best guess — never as an open question — and evidence quality flagged.
 
 ### `architecture-kayaba`
 - **Input:** the PRD plus the list of involved systems and their programming languages.
-- **Work done:** designs the full technical architecture across 8 sections — system responsibilities and boundaries, tech stack (justified), synchronous/asynchronous contracts, data models, integration points, and every architectural decision with its reasoning. May ask up to two rounds of questions.
+- **Work done:** designs the full technical architecture across 8 sections — system responsibilities and boundaries, tech stack (justified), synchronous/asynchronous contracts, data models, integration points, and every architectural decision with its reasoning. Always asks two rounds of questions in Default mode, none in Silent mode.
 - **Output:** a self-contained architecture document that downstream agents treat as the technical source of truth.
 
 ### `deliverables-kenshin`
